@@ -201,6 +201,63 @@ def summarize_article(title: str, body_text: str) -> Dict[str, object]:
             'insights': ["원문에서 명시적인 회고·제안 문장을 찾지 못했습니다."]
         }
 
+    # 작성자가 자신의 경험을 설명하는 회고형 기사라면 단어 빈도보다
+    # 사건의 순서를 우선한다: 시도 → 예상 밖 결과 → 원인 → 교훈.
+    first_person_count = sum(
+        1 for sent in sentences if any(word in sent for word in ['저는', '제가', '필자는'])
+    )
+    if first_person_count >= 2:
+        def find_narrative_sentence(keywords: List[str], start: int = 0) -> Tuple[int, str]:
+            for idx in range(start, len(sentences)):
+                if any(keyword in sentences[idx] for keyword in keywords):
+                    return idx, sentences[idx]
+            return -1, ""
+
+        intro_idx, intro = find_narrative_sentence(
+            ['경력', '현재', '지난', '처음', '진행했습니다', '만들었습니다']
+        )
+        turn_idx, turning_point = find_narrative_sentence(
+            ['그런데', '하지만', '막상', '문제는', '예상 못 한'], max(intro_idx + 1, 0)
+        )
+        cause_idx, cause = find_narrative_sentence(
+            ['원인은', '빠진 것은', '때문', '이유', '실패'], max(turn_idx + 1, 0)
+        )
+        lesson_idx, lesson = find_narrative_sentence(
+            ['핵심은', '필요합니다', '중요합니다', '깨달았습니다', '전하고 싶었습니다'],
+            max(len(sentences) // 2, cause_idx + 1),
+        )
+
+        if intro and turning_point and lesson:
+            issue_candidates = [
+                sent for sent in sentences
+                if any(keyword in sent for keyword in [
+                    '문제', '실패', '작동하지', '무너', '위험', '한계', '오류'
+                ])
+            ][:3]
+            insight_candidates = [
+                sent for sent in sentences[len(sentences) // 2:]
+                if any(keyword in sent for keyword in [
+                    '핵심', '필요', '중요', '깨달', '해야', '전하고'
+                ])
+            ][:3]
+
+            return {
+                'background': concise_quote(intro),
+                'why': " ".join(
+                    concise_quote(item) for item in [turning_point, cause]
+                    if item
+                ),
+                'so_what': concise_quote(lesson),
+                'key_issues': (
+                    [concise_quote(sent) for sent in issue_candidates]
+                    or ["기사에서 작성자가 경험한 문제를 충분히 찾지 못했습니다."]
+                ),
+                'insights': (
+                    [concise_quote(sent) for sent in insight_candidates]
+                    or ["기사에서 작성자가 제시한 교훈을 충분히 찾지 못했습니다."]
+                ),
+            }
+
     title_words = set(extract_words(title))
     all_words = extract_words(body_text)
     word_counts = Counter(all_words)
