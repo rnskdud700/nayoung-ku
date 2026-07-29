@@ -2,6 +2,7 @@ import os
 from datetime import datetime
 from html import escape
 from typing import Dict, Any, List
+from zoneinfo import ZoneInfo
 from config import DASHBOARD_HTML_PATH, DASHBOARD_TEMP_PATH
 
 
@@ -74,7 +75,7 @@ def build_dashboard_html(yozm_data: Dict[str, Any], naver_data: Dict[str, Any]) 
     """
     최신 수집 결과를 바탕으로 1100px 반응형 IT 뉴스 대시보드(dashboard.html)를 원자적(Atomic)으로 생성
     """
-    now = datetime.now()
+    now = datetime.now(ZoneInfo("Asia/Seoul"))
     date_str = now.strftime("%Y년 %m월 %d일 (%a)")
     time_str = now.strftime("%H:%M:%S")
 
