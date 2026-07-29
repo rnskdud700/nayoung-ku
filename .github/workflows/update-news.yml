@@ -35,7 +35,11 @@ jobs:
       - name: 최신 뉴스 수집
         run: |
           python main.py
-          cp dashboard.html index.html
+          if grep -q "요즘IT (5)" dashboard.html && grep -q "네이버 IT·과학 (5)" dashboard.html; then
+            cp dashboard.html index.html
+          else
+            echo "한 곳 이상의 뉴스 수집이 불완전하여 기존 정상 화면을 유지합니다."
+          fi
           touch .nojekyll
       - name: GitHub Pages 준비
         uses: actions/configure-pages@v5
