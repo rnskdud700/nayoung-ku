@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>오늘의 AI · IT 브리핑👨🏼💻</title>
+    <style>
+        :root {
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --primary-light: #eff6ff;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --badge-bg: #dbeafe;
+            --badge-text: #1e40af;
+            --new-badge: #ef4444;
+            --naver-green: #03c75a;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            line-height: 1.6;
+            padding: 24px 16px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 28px 24px;
+            margin-bottom: 24px;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .header-title-group h1 {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 6px;
+            letter-spacing: -0.5px;
+        }
+
+        .header-subtitle {
+            font-size: 15px;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .header-meta {
+            text-align: right;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .nav-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 8px;
+            text-decoration: none;
+            cursor: pointer;
+            border: 1px solid var(--border-color);
+            background-color: var(--card-bg);
+            color: var(--text-dark);
+            transition: background-color 0.15s ease;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-light);
+            color: var(--primary);
+            border-color: #bfdbfe;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: #ffffff;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            color: #ffffff;
+        }
+
+        .tab-button.active {
+            background-color: var(--primary);
+            color: #ffffff;
+            border-color: var(--primary);
+        }
+
+        .news-section {
+            display: none;
+        }
+
+        .news-section.active {
+            display: block;
+        }
+
+        .auto-refresh-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        /* Section Titles */
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 36px;
+            margin-bottom: 16px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary);
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .count-badge {
+            background-color: var(--badge-bg);
+            color: var(--badge-text);
+            font-size: 12px;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 12px;
+        }
+
+        /* News Grid Layout (Desktop: 2 Columns, Mobile: 1 Column) */
+        .news-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        @media (min-width: 768px) {
+            .news-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* News Card */
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 22px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .card-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .source-tag {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+        }
+
+        .source-tag-naver {
+            color: var(--naver-green);
+        }
+
+        .new-badge {
+            background-color: var(--new-badge);
+            color: #ffffff;
+            font-size: 10px;
+            font-weight: 800;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .card-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 14px;
+            line-height: 1.4;
+            word-break: break-word;
+            overflow-wrap: anywhere;
+        }
+
+        .card-title a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .card-title a:hover {
+            color: var(--primary);
+        }
+
+        .summary-box {
+            background-color: var(--primary-light);
+            border-radius: 8px;
+            padding: 14px 16px;
+            margin-bottom: 14px;
+        }
+
+        .summary-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .summary-section {
+            padding: 13px 0;
+            border-top: 1px solid #bfdbfe;
+        }
+
+        .summary-section:first-of-type {
+            padding-top: 0;
+            border-top: 0;
+        }
+
+        .summary-section:last-child {
+            padding-bottom: 0;
+        }
+
+        .summary-section-title {
+            font-size: 14px;
+            font-weight: 800;
+            color: #1e40af;
+            margin-bottom: 6px;
+        }
+
+        .summary-copy {
+            font-size: 14px;
+            color: #334155;
+            line-height: 1.75;
+            margin: 0;
+            word-break: keep-all;
+            overflow-wrap: break-word;
+        }
+
+        .source-link-row a {
+            color: var(--primary);
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .source-link-row a:hover {
+            text-decoration: underline;
+        }
+
+        .card-action {
+            margin-top: auto;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .btn-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--primary);
+            text-decoration: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid #bfdbfe;
+            background-color: #ffffff;
+        }
+
+        .btn-link:hover {
+            background-color: var(--primary);
+            color: #ffffff;
+        }
+
+        /* Small Status Section at Bottom */
+        .status-footer {
+            margin-top: 48px;
+            background-color: #f1f5f9;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 16px 20px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .status-footer h4 {
+            font-size: 13px;
+            color: var(--text-dark);
+            margin-bottom: 6px;
+        }
+
+        .failed-item {
+            color: #64748b;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-top">
+                <div class="header-title-group">
+                    <h1>오늘의 AI · IT 브리핑👨🏼💻</h1>
+                    <div class="header-subtitle">5분이면 충분해요🤩</div>
+                </div>
+                <div class="header-meta">
+                    <div>📅 </div>
+                    <div>🕒 마지막 업데이트: <strong>11:38:17</strong></div>
+                </div>
+            </div>
+
+            <div class="nav-toolbar">
+                <div class="nav-buttons">
+                    <button type="button" class="btn tab-button active" onclick="showNewsSection('yozm-section', this)">📰 요즘IT (5)</button>
+                    <button type="button" class="btn tab-button" onclick="showNewsSection('naver-section', this)">💻 네이버 IT·과학 (5)</button>
+                    <button onclick="location.reload()" class="btn btn-primary">지금 새로고침✅</button>
+                </div>
+                <div class="auto-refresh-group">
+                    <label style="cursor: pointer;">
+                        <input type="checkbox" id="autoRefreshToggle" checked onchange="toggleAutoRefresh(this)">
+                        5분 자동 새로고침 켜기
+                    </label>
+                </div>
+            </div>
+        </header>
+
+        <!-- 요즘IT Section -->
+        <section id="yozm-section" class="news-section active">
+            <div class="section-header">
+                <div class="section-title">
+                    <span>📰 요즘IT (Wishket Magazine)</span>
+                    <span class="count-badge">5개</span>
+                </div>
+            </div>
+
+            <div class="news-grid">
+
+                <article class="card">
+                    <div>
+                        <div class="card-meta">
+                            <span class="source-tag ">요즘IT</span>
+                            <span class="new-badge">NEW</span>
+                        </div>
+                        <h2 class="card-title">
+                            <a href="https://yozm.wishket.com/magazine/detail/3857/" target="_blank" rel="noopener noreferrer">클로드 코드로 5일 만에 웹 포털 런칭한 방법</a>
+                        </h2>
+                        <div class="summary-box">
+                            <div class="summary-section">
+                                <div class="summary-section-title">💡 요약</div>
+                                <p class="summary-copy">클코나잇 2 웨비나에서 &#x27;클로드 코드로 5일 만에 웹 포털 런칭한 방법&#x27;을 정리한 것입니다. 처음에는 &#x27;네트워크 문제겠지&#x27;라고 생각했는데, 원인은 인프라의 기본값에 있었습니다. 제가 해결해야 했던 과제는 슬랙 기반의 정산 비효율을 해결하는 것이었는데요.</p>
+                            </div>
+                            <div class="summary-section">
+                                <div class="summary-section-title">🔗 원문 링크</div>
+                                <p class="summary-copy source-link-row">
+                                    <a href="https://yozm.wishket.com/magazine/detail/3857/" target="_blank" rel="noopener noreferrer">기사 원문 바로가기 →</a>
+                                </p>
+                            </div>
+                            <div class="summary-section">
+                                <div class="summary-section-title">🔥 핵심 이슈</div>
+                                <p class="summary-copy">그중에서도 만드는 것을 넘어 운영 단계에서 마주친 어려움과, 그 이슈 또한 클로드 코드로 해결해 나간 이야기를 중점적으로 전달드리고자 합니다. 이 일은 제가 AX 전략팀에서 일하고 있다 보니 첫 AX 과제로 진행하게 된 일이었습니다. 제가 해결해야 했던 과제는 슬랙 기반의 정산 비효율을 해결하는 것이었는데요.</p>
+                            </div>
+                            <div class="summary-section">
+                                <div class="summary-section-title">🧠 왜 중요한가?</div>
+                                <p class="summary-copy">이 일은 제가 AX 전략팀에서 일하고 있다 보니 첫 AX 과제로 진행하게 된 일이었습니다. 이 프로젝트를 진행하면서 하나 더 깨달은 부분이 있습니다. 마지막 세 번째 파트는, 만드는 것과 운영하는 것은 다르다는 걸 깨달은 시행착오에 대한 이야기입니다.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-action">
+                        <a href="https://yozm.wishket.com/magazine/detail/3857/" target="_blank" rel="noopener noreferrer" class="btn-link">원문 보기 ↗</a>
+                    </div>
+                </article>
+        
+                <article class="card">
+                    <div>
+                        <div class="card-meta">
+                            <span class="source-tag ">요즘IT</span>
+                            <span class="new-badge">NEW</span>
+                        </div>
+                        <h2 class="card-title">
+                            <a href="https://yozm.wishket.com/magazine/detail/3852/" target="_blank" rel="noopener noreferrer">AI와 200만 줄의 코드를 작성하며 깨달은 것들</a>
+                        </h2>
+                        <div class="summary-box">
+                            <div class="summary-section">
+                                <div class="summary-section-title">💡 요약</div>
+                                <p class="summary-copy">그리고 지난 몇 달간, AI와 단둘이서 200만 줄이 넘는 코드를 짰습니다. 그 원인으로는 비용 증가, 불명확한 비즈니스 가치, 부족한 위험 통제를 꼽았죠. 결국 한쪽을 당기면 다른 쪽이 끌려오는, 삼각형의 줄다리기인 셈입니다.</p>
+                            </div>
+                            <div class="summary-section">
+                                <div class="summary-section-title">🔗 원문 링크</div>
+                                <p class="summary-copy source-link-row">
+                                    <a href="https://yozm.wishket.com/magazine/detail/3852/" target="_blank" rel="noopener noreferrer">기사 원문 바로가기 →</a>
+                                </p>
+                            </div>
+                            <div class="summary-section">
+                                <div class="summary-section-title">🔥 핵심 이슈</div>
+                                <p class="summary-copy">문제는 그 지표가 거짓말을 하고 있었다는 겁니다. 흥미로운 건, 이게 저만의 문제가 아니라는 점입니다. 그 원인으로는 비용 증가, 불명확한 비즈니스 가치, 부족한 위험 통제를 꼽았죠.</p>
+                            </div>
+                            <div class="summary-section">
+                                <div class="summary-section-title">🧠 왜 중요한가?</div>
+                                <p class="summary-copy">필요한 건 더 좋은 맥락이고, 그 맥락의 핵심은 ‘왜’입니다. 혼자 운영하는 시스템은, 팀이 운영하는 시스템보다 더 엄격해야 한다. 핵심은, 이 세 가지를 동시에 다 가질 수 없다는 겁니다.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-action">
+                        <a href="https://yozm.wishket.com/magazine/detail/3852/" target="_blank" rel="noopener noreferrer" class="btn-link">원문 보기 ↗</a>
+                    </div>
+                </article>
+        
+                <article class="card">
+                    <div>
+                        <div class="card-meta">
+                            <span class="source-tag ">요즘IT</span>
+                            <span class="new-badge">NEW</span>
+                        </div>
+                        <h2 class="card-title">
+                            <a href="https://yozm.wishket.com/magazine/detail/3855/" target="_blank" rel="noopener noreferrer">AI 시대 프로덕트팀 재설계법(feat. 보리스 체르니)</a>
+                        </h2>
+                        <div class="summary-box">
+                            <div class="summary-section">
+                                <div class="summary-section-title">💡 요약</div>
+                                <p class="summary-copy">그런데 앤트로픽에서 클로드 코드(Claude Code)를 총괄하는 보리스 체르니(@bcherny)가 그 변화를 트윗 한 장으로 꽤 깔끔하게 정리해줬더라고요. 분명 PM인데 요즘 하는 일은 3년 전 PM이 아니고, 디자이너라면서 코드를 만지고 있고, 백엔드 개발자인데 제품 기획 회의에 앉아 있고요. PMF 이전 초기 제품은 프로토타이퍼·빌더·스위퍼의 힘이 필요하고 PMF를 잡고 성장하는 제품은 빌더·스위퍼·그로워에 유지보수를 조금 얹은 조합이 필요하다고 제안합니다.</p>
+                            </div>
+                            <div class="summary-section">
+                                <div class="summary-section-title">🔗 원문 링크</div>
+                                <p class="summary-copy source-link-row">
+                                    <a href="https://yozm.wishket.com/magazine/detail/3855/" target="_blank" rel="noopener noreferrer">기사 원문 바로가기 →</a>
+                                </p>
+                            </div>
+                            <div class="summary-section">
+                                <div class="summary-section-title">🔥 핵심 이슈</div>
+                                <p class="summary-copy">원문에서 명시적으로 설명한 문제를 찾지 못했습니다.</p>
+                            </div>
+                            <div class="summary-section">
+                                <div class="summary-section-title">🧠 왜 중요한가?</div>
+                                <p class="summary-copy">PMF 이전 초기 제품은 프로토타이퍼·빌더·스위퍼의 힘이 필요하고 PMF를 잡고 성장하는 제품은 빌더·스위퍼·그로워에 유지보수를 조금 얹은 조합이 필요하다고 제안합니다. 하지만 이 주장도 사실 같은 방향을 향하고 있다고 생각합니다. 넓이로나 깊이로나 한 사람이 모든 걸 할 수는 없고, 그동안 제품을 만들기 위해 쌓아 올린 모범 사례가 있으며, 그 모범사례를 가진 전문 영역이란 건 여전히 중요하다는 것입니다.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-action">
+                        <a href="https://yozm.wishket.com/magazine/detail/3855/" target="_blank" rel="noopener noreferrer" class="btn-link">원문 보기 ↗</a>
+                    </div>
+                </article>
+        
+                <article class="card">
+                    <div>
+                        <div class="card-meta">
+                            <span class="source-tag ">요즘IT</span>
+                            <span class="new-badge">NEW</span>
+                        </div>
+                        <h2 class="card-title">
+                            <a href="https://yozm.wishket.com/magazine/detail/3854/" target="_blank" rel="noopener noreferrer">AI로 작성하셨나요? &#x27;Im-not-ai&#x27;로 AI 티 지우기</a>
+                        </h2>
+                        <div class="summary-box">
+                            <div class="summary-section">
+                                <div class="summary-section-title">💡 요약</div>
+                                <p class="summary-copy">이번 글에서는 문맥의 기계적 패턴을 식별해 교정하는 오픈소스 프로젝트 “im-not-ai”로, 그 원리와 문제점을 짚어보고 최적화 전략까지 살펴보겠습니다. 오픈소스 프로젝트 “im-not-ai”는 글 생성 후 진행하는 윤문, 후편집의 비효율을 통제하기 위해 등장한 도구입니다. 결국 우리가 AI 글을 읽으며 느낀 묘한 불쾌감은 역사적으로 오랜 연구 대상이었던 &#x27;번역투의 악화된 형태&#x27;였던 겁니다.</p>
+                            </div>
+                            <div class="summary-section">
+                                <div class="summary-section-title">🔗 원문 링크</div>
+                                <p class="summary-copy source-link-row">
+                                    <a href="https://yozm.wishket.com/magazine/detail/3854/" target="_blank" rel="noopener noreferrer">기사 원문 바로가기 →</a>
+                                </p>
+                            </div>
+                            <div class="summary-section">
+                                <div class="summary-section-title">🔥 핵심 이슈</div>
+                                <p class="summary-copy">오히려 AI가 써준 초안의 어색함을 지우려고, 윤문과 후편집에 더 많은 시간을 쏟는 거죠. 이번 글에서는 문맥의 기계적 패턴을 식별해 교정하는 오픈소스 프로젝트 “im-not-ai”로, 그 원리와 문제점을 짚어보고 최적화 전략까지 살펴보겠습니다. 윤문 프로세스가 독자에게 주는 영향은 긍정적이지만, 실무에 ‘im-not-ai’를 도입할 때 고려해야 할 두 가지 한계가 있습니다.</p>
+                            </div>
+                            <div class="summary-section">
+                                <div class="summary-section-title">🧠 왜 중요한가?</div>
+                                <p class="summary-copy">그러나 진짜 업무는 AI가 준 작업물을 우리가 검토하는 순간부터라고 생각합니다. 저 역시 AI로 생성한 5,000자 분량의 기획서 초안을 보고, 어색하고 불편하다고 느꼈습니다. 결국 우리가 AI 글을 읽으며 느낀 묘한 불쾌감은 역사적으로 오랜 연구 대상이었던 &#x27;번역투의 악화된 형태&#x27;였던 겁니다.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-action">
+                        <a href="https://yozm.wishket.com/magazine/detail/3854/" target="_blank" rel="noopener noreferrer" class="btn-link">원문 보기 ↗</a>
+                    </div>
+                </article>
+        
+                <article class="card">
+                    <div>
+                        <div class="card-meta">
+                            <span class="source-tag ">요즘IT</span>
+                            <span class="new-badge">NEW</span>
+                        </div>
+                        <h2 class="card-title">
+                            <a href="https://yozm.wishket.com/magazine/detail/3858/" target="_blank" rel="noopener noreferrer">AI가 다 만드는데, 왜 자꾸 기획을 말할까?</a>
+                        </h2>
+                        <div class="summary-box">
+                            <div class="summary-section">
+                                <div class="summary-section-title">💡 요약</div>
+                                <p class="summary-copy">이렇게 만드는 비용이 확 낮아지자, 시장의 룰도 함께 바뀌고 있습니다. 머리로 상상하고 시뮬레이션하는 비용보다, 빠르게 만들어서 눈으로 보고 체감해보는 것이 훨씬 이득이기 때문이죠. 결국 이렇게 여러 단계를 거쳐, 어렵사리 만든 MVP를 시장에 냈다가 반응이 없으면, 그동안 쏟아부은 여러 부서의 시간과 노력이 통째로 매몰 비용이 되어 사라지곤 했죠.</p>
+                            </div>
+                            <div class="summary-section">
+                                <div class="summary-section-title">🔗 원문 링크</div>
+                                <p class="summary-copy source-link-row">
+                                    <a href="https://yozm.wishket.com/magazine/detail/3858/" target="_blank" rel="noopener noreferrer">기사 원문 바로가기 →</a>
+                                </p>
+                            </div>
+                            <div class="summary-section">
+                                <div class="summary-section-title">🔥 핵심 이슈</div>
+                                <p class="summary-copy">매몰되는 비용이 극단적으로 줄었기 때문에 그만큼 부담도 줄어들었습니다. 이렇게 생각 없이 AI를 통해 속도만 올릴 때의 문제는 그럴싸해 보이지만, 쓸모없는 결과물이 만들어진다는 겁니다. 명확한 의도 없이 AI에 의존해 뚝딱 만들어낸 화면은 겉보기엔 그럴듯해 보여도, 정작 사용자의 진짜 문제를 해결해 주지 못하는 무용지물이 되기 쉽습니다.</p>
+                            </div>
+                            <div class="summary-section">
+                                <div class="summary-section-title">🧠 왜 중요한가?</div>
+                                <p class="summary-copy">결국 이렇게 여러 단계를 거쳐, 어렵사리 만든 MVP를 시장에 냈다가 반응이 없으면, 그동안 쏟아부은 여러 부서의 시간과 노력이 통째로 매몰 비용이 되어 사라지곤 했죠. 결국 진짜 제품은 시작도 하지 않은 상태에서, 이미 엄청난 기획 리소스가 매몰되고 마는 셈입니다. 여기서 핵심은 ‘실패를 마음껏 해볼 수 있는 기회’를 얻었다는 점입니다.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-action">
+                        <a href="https://yozm.wishket.com/magazine/detail/3858/" target="_blank" rel="noopener noreferrer" class="btn-link">원문 보기 ↗</a>
+                    </div>
+                </article>
+        
+            </div>
+        </section>
+
+        <section id="naver-section" class="news-section">
+            <div class="section-header">
+                <div class="section-title">
+                    <span>💻 네이버 IT·과학 헤드라인</span>
+                    <span class="count-badge">5개</span>
+                </div>
+            </div>
+            <div class="news-grid">
+
+                <article class="card">
+                    <div>
+                        <div class="card-meta">
+                            <span class="source-tag source-tag-naver">네이버 IT·과학</span>
+                            <span class="new-badge">NEW</span>
+                        </div>
+                        <h2 class="card-title">
+                            <a href="https://n.news.naver.com/mnews/article/421/0009084945" target="_blank" rel="noopener noreferrer">과기정통부, &#x27;AI 혁신인재 커넥트&#x27; 개최…&quot;AI 핵심인재 확보&quot;</a>
+                        </h2>
+                        <div class="summary-box">
+                            <div class="summary-section">
+                                <div class="summary-section-title">💡 요약</div>
+                                <p class="summary-copy">AI 인재양성 주요 성과공유AI 대학원생 등 혁신인재 도전과 성장 격려 사업 성과를 공유하고 미래 비전을 논의하기 위해 2020년부터 매년 열리고 있다. 행사는 오는 31일까지 서울 코엑스에서 열린다.</p>
+                            </div>
+                            <div class="summary-section">
+                                <div class="summary-section-title">🔗 원문 링크</div>
+                                <p class="summary-copy source-link-row">
+                                    <a href="https://n.news.naver.com/mnews/article/421/0009084945" target="_blank" rel="noopener noreferrer">기사 원문 바로가기 →</a>
+                                </p>
+                            </div>
+                            <div class="summary-section">
+                                <div class="summary-section-title">🔥 핵심 이슈</div>
+                                <p class="summary-copy">원문에서 명시적으로 설명한 문제를 찾지 못했습니다.</p>
+                            </div>
+                            <div class="summary-section">
+                                <div class="summary-section-title">🧠 왜 중요한가?</div>
+                                <p class="summary-copy">원문에서 명시적인 회고·제안 문장을 찾지 못했습니다.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-action">
+                        <a href="https://n.news.naver.com/mnews/article/421/0009084945" target="_blank" rel="noopener noreferrer" class="btn-link">원문 보기 ↗</a>
+                    </div>
+                </article>
+        
+                <article class="card">
+                    <div>
+                        <div class="card-meta">
+                            <span class="source-tag source-tag-naver">네이버 IT·과학</span>
+                            <span class="new-badge">NEW</span>
+                        </div>
+                        <h2 class="card-title">
+                            <a href="https://n.news.naver.com/mnews/article/011/0004646372" target="_blank" rel="noopener noreferrer">SK텔레콤, 추론능력 강화한 독파모 2차 모델 공개...산업 AX 확대</a>
+                        </h2>
+                        <div class="summary-box">
+                            <div class="summary-section">
+                                <div class="summary-section-title">💡 요약</div>
+                                <p class="summary-copy">초거대 AI 모델 A.X K2 제조·국방·바이오 등 적용조단위 매개변수로 확대 추진 사진제공=SK텔레콤SK텔레콤(017670)이 추론 능력을 강화한 독자 인공지능(AI) 파운데이션 모델 ‘A.X(에이닷엑스) K2’를 공개하며 자체 초거대언어모델(LLM) 고도화에 나섰다. 5190억개 규모였던 매개변수 또한 6880억개로 늘었다.A.X K2는 긴 문맥에서도 필요한 정보만 선별해 처리하도록 설계됐다.</p>
+                            </div>
+                            <div class="summary-section">
+                                <div class="summary-section-title">🔗 원문 링크</div>
+                                <p class="summary-copy source-link-row">
+                                    <a href="https://n.news.naver.com/mnews/article/011/0004646372" target="_blank" rel="noopener noreferrer">기사 원문 바로가기 →</a>
+                                </p>
+                            </div>
+                            <div class="summary-section">
+                                <div class="summary-section-title">🔥 핵심 이슈</div>
+                                <p class="summary-copy">원문에서 명시적으로 설명한 문제를 찾지 못했습니다.</p>
+                            </div>
+                            <div class="summary-section">
+                                <div class="summary-section-title">🧠 왜 중요한가?</div>
+                                <p class="summary-copy">원문에서 명시적인 회고·제안 문장을 찾지 못했습니다.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-action">
+                        <a href="https://n.news.naver.com/mnews/article/011/0004646372" target="_blank" rel="noopener noreferrer" class="btn-link">원문 보기 ↗</a>
+                    </div>
+                </article>
+        
+                <article class="card">
+                    <div>
+                        <div class="card-meta">
+                            <span class="source-tag source-tag-naver">네이버 IT·과학</span>
+                            <span class="new-badge">NEW</span>
+                        </div>
+                        <h2 class="card-title">
+                            <a href="https://n.news.naver.com/mnews/article/081/0003665354" target="_blank" rel="noopener noreferrer">동성로에 무인 셔틀, 산단에 자율주행 화물차…대구 미래모빌리티 실증사업 가동</a>
+                        </h2>
+                        <div class="summary-box">
+                            <div class="summary-section">
+                                <div class="summary-section-title">💡 요약</div>
+                                <p class="summary-copy">대구시 물류 자율주행 실증 사업 노선도. 시가 미래 모빌리티 실증사업을 본격적으로 추진하면서다.28일 대구시에 따르면 이번 실증사업은 물류 자율주행과 여객 무인 셔틀, AI 드론 스마트 치안 서비스 등 3개 분야로 추진된다. 대구시 제공올해 하반기부터 대구 동성로 일대에 자율주행 무인 셔틀이 운행되고 대형 자율주행 화물차가 수성알파시티와 대구국가산업단지를 드나든다.</p>
+                            </div>
+                            <div class="summary-section">
+                                <div class="summary-section-title">🔗 원문 링크</div>
+                                <p class="summary-copy source-link-row">
+                                    <a href="https://n.news.naver.com/mnews/article/081/0003665354" target="_blank" rel="noopener noreferrer">기사 원문 바로가기 →</a>
+                                </p>
+                            </div>
+                            <div class="summary-section">
+                                <div class="summary-section-title">🔥 핵심 이슈</div>
+                                <p class="summary-copy">원문에서 명시적으로 설명한 문제를 찾지 못했습니다.</p>
+                            </div>
+                            <div class="summary-section">
+                                <div class="summary-section-title">🧠 왜 중요한가?</div>
+                                <p class="summary-copy">원문에서 명시적인 회고·제안 문장을 찾지 못했습니다.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-action">
+                        <a href="https://n.news.naver.com/mnews/article/081/0003665354" target="_blank" rel="noopener noreferrer" class="btn-link">원문 보기 ↗</a>
+                    </div>
+                </article>
+        
+                <article class="card">
+                    <div>
+                        <div class="card-meta">
+                            <span class="source-tag source-tag-naver">네이버 IT·과학</span>
+                            <span class="new-badge">NEW</span>
+                        </div>
+                        <h2 class="card-title">
+                            <a href="https://n.news.naver.com/mnews/article/030/0003451994" target="_blank" rel="noopener noreferrer">KAIST, &#x27;미세 플라스틱&#x27; 발생 원리 규명...“녹조가 발생 앞당겨”</a>
+                        </h2>
+                        <div class="summary-box">
+                            <div class="summary-section">
+                                <div class="summary-section-title">💡 요약</div>
+                                <p class="summary-copy">KAIST 내 연못 시료로 제작한 미니 생태계 및 부영양 조건 아래 플라스틱 표면 위 형성된 미생물 막여름 강·호수를 덮는 녹조가 플라스틱을 더 쉽게 부서지게 해 &#x27;미세플라스틱&#x27; 발생을 앞당길 수 있다는 사실이 밝혀졌다. 이후 6주 동안 플라스틱 표면에 형성되는 미생물막과 미생물 군집, 유전자 변화를 정밀 분석했다.분석 결과, 족조가 발생하는 부영양화 환경에서는 남세균(대표적인 광합성 세균)과 다양한 일반 세균이 함께 늘어나면서 플라스틱 표면에 더욱 두꺼운 바이오필름(미생물막)을 형성했다. 연구팀은 특정 미생물 한 종이 아니라 광합성 세균과 일반 세균이 함께 이루는 미생물 생태계가 이런 변화를 이끈 것으로 분석했다.명재욱 교수는 “기후변화로 녹조가 더욱 빈번해지는 만큼 수질 관리와 폐플라스틱 관리를 함께 고려하는 통합적인 환경관리 전략 수립에 중요한 근거가 될 것으로 기대한다”고 말했다.이번 연구는 김영주 건설 및 환경공학과 박사과정생이 제1저자로 참여했으며, 연구 결과는…</p>
+                            </div>
+                            <div class="summary-section">
+                                <div class="summary-section-title">🔗 원문 링크</div>
+                                <p class="summary-copy source-link-row">
+                                    <a href="https://n.news.naver.com/mnews/article/030/0003451994" target="_blank" rel="noopener noreferrer">기사 원문 바로가기 →</a>
+                                </p>
+                            </div>
+                            <div class="summary-section">
+                                <div class="summary-section-title">🔥 핵심 이슈</div>
+                                <p class="summary-copy">연구팀은 특정 미생물 한 종이 아니라 광합성 세균과 일반 세균이 함께 이루는 미생물 생태계가 이런 변화를 이끈 것으로 분석했다.명재욱 교수는 “기후변화로 녹조가 더욱 빈번해지는 만큼 수질 관리와 폐플라스틱 관리를 함께 고려하는 통합적인 환경관리 전략 수립에 중요한 근거가 될 것으로 기대한다”고 말했다.이번 연구는 김영주 건설 및 환경공학과 박사과정생이 제1저자로 참여했으며, 연구 결과는…</p>
+                            </div>
+                            <div class="summary-section">
+                                <div class="summary-section-title">🧠 왜 중요한가?</div>
+                                <p class="summary-copy">원문에서 명시적인 회고·제안 문장을 찾지 못했습니다.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-action">
+                        <a href="https://n.news.naver.com/mnews/article/030/0003451994" target="_blank" rel="noopener noreferrer" class="btn-link">원문 보기 ↗</a>
+                    </div>
+                </article>
+        
+                <article class="card">
+                    <div>
+                        <div class="card-meta">
+                            <span class="source-tag source-tag-naver">네이버 IT·과학</span>
+                            <span class="new-badge">NEW</span>
+                        </div>
+                        <h2 class="card-title">
+                            <a href="https://n.news.naver.com/mnews/article/008/0005392626" target="_blank" rel="noopener noreferrer">&quot;위험한 현장은 로봇이, 서류는 AI가&quot;…포스코DX, AI 네이티브 컴퍼니 선언</a>
+                        </h2>
+                        <div class="summary-box">
+                            <div class="summary-section">
+                                <div class="summary-section-title">💡 요약</div>
+                                <p class="summary-copy">시뮬레이션을 기반으로 최적의 로봇시스템을 설계하고 이동형 로봇에 적용하는 VLA(Vision Language Action) 모델 개발을 통한 로봇 보행과 매니퓰레이션(정교한 물체 조작) 고도화도 추진한다.포스코DX는 이날 제철소 아연도금 공정 용융로에서 발생하는 불순물 제거 작업 로봇, 냉연 공정의 밴드 커터 로봇, 65톤급 철강 제품을 자동 이송하는 AGV(무인이송장비) 등과 같이… 29./사진제공=포스코DX포스코DX는 사무·경영 환경을 대상으로 하는 에이전틱 AI 구현을 위해 AI 에이전트를 사람 직원처럼 채용부터 평가, 육성, 승진·퇴직까지 생애주기를 통합 관리하는 플랫폼 &#x27;에이전티&#x27;를 자체 개발했다. 기업의 업무 흐름을 분석해 사람과 AI 에이전트가 역할을 나눠 수행하는 업무 프로세스를 설계하는 AX 컨설팅을 진행하고 에이전티는 이를 기반으로 맞춤형 에이전트를 생성하거나 기존 에이전트를 재활용해 개발한다.</p>
+                            </div>
+                            <div class="summary-section">
+                                <div class="summary-section-title">🔗 원문 링크</div>
+                                <p class="summary-copy source-link-row">
+                                    <a href="https://n.news.naver.com/mnews/article/008/0005392626" target="_blank" rel="noopener noreferrer">기사 원문 바로가기 →</a>
+                                </p>
+                            </div>
+                            <div class="summary-section">
+                                <div class="summary-section-title">🔥 핵심 이슈</div>
+                                <p class="summary-copy">시뮬레이션을 기반으로 최적의 로봇시스템을 설계하고 이동형 로봇에 적용하는 VLA(Vision Language Action) 모델 개발을 통한 로봇 보행과 매니퓰레이션(정교한 물체 조작) 고도화도 추진한다.포스코DX는 이날 제철소 아연도금 공정 용융로에서 발생하는 불순물 제거 작업 로봇, 냉연 공정의 밴드 커터 로봇, 65톤급 철강 제품을 자동 이송하는 AGV(무인이송장비) 등과 같이…</p>
+                            </div>
+                            <div class="summary-section">
+                                <div class="summary-section-title">🧠 왜 중요한가?</div>
+                                <p class="summary-copy">원문에서 명시적인 회고·제안 문장을 찾지 못했습니다.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-action">
+                        <a href="https://n.news.naver.com/mnews/article/008/0005392626" target="_blank" rel="noopener noreferrer" class="btn-link">원문 보기 ↗</a>
+                    </div>
+                </article>
+        
+            </div>
+        </section>
+
+        <!-- Bottom Status -->
+        <footer class="status-footer">
+            <h4>⚙️ 수집 상태 정보</h4>
+            <div>• 수집 데이터베이스: sent_articles.db 연동 정상</div>
+<div>• 모든 대상 사이트 수집 시도 완료</div>
+        </footer>
+    </div>
+
+    <script>
+        let refreshTimer = null;
+
+        function showNewsSection(sectionId, button) {
+            document.querySelectorAll('.news-section').forEach((section) => {
+                section.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-button').forEach((tabButton) => {
+                tabButton.classList.remove('active');
+            });
+            document.getElementById(sectionId).classList.add('active');
+            button.classList.add('active');
+        }
+
+        function startAutoRefresh() {
+            refreshTimer = setInterval(() => {
+                console.log("5분 자동 새로고침 실행");
+                location.reload();
+            }, 300000);
+        }
+
+        function stopAutoRefresh() {
+            if (refreshTimer) {
+                clearInterval(refreshTimer);
+                refreshTimer = null;
+            }
+        }
+
+        function toggleAutoRefresh(checkbox) {
+            if (checkbox.checked) {
+                startAutoRefresh();
+            } else {
+                stopAutoRefresh();
+            }
+        }
+
+        startAutoRefresh();
+    </script>
+</body>
+</html>
