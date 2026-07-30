@@ -4,6 +4,7 @@ on:
   push:
     branches: ["main"]
   schedule:
+    # 한국·일본 시간 오전 10시 (UTC 오전 1시)
     - cron: "0 1 * * *"
   workflow_dispatch:
 
@@ -22,17 +23,25 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+
     steps:
       - name: 파일 준비
         uses: actions/checkout@v4
+
       - name: 파이썬 준비
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
           cache: pip
+
       - name: 필요한 도구 설치
-        run: pip install -r requirements.txt
-      - name: 최신 뉴스 수집
+        run: |
+          pip install -r requirements.txt
+          python -m playwright install --with-deps chromium
+
+      - name: 브라우저로 최신 뉴스 수집
+        env:
+          BROWSER_SCRAPING: "1"
         run: |
           python main.py
           if grep -q "요즘IT (5)" dashboard.html && grep -q "네이버 IT·과학 (5)" dashboard.html; then
@@ -41,12 +50,15 @@ jobs:
             echo "한 곳 이상의 뉴스 수집이 불완전하여 기존 정상 화면을 유지합니다."
           fi
           touch .nojekyll
+
       - name: GitHub Pages 준비
         uses: actions/configure-pages@v5
+
       - name: 공개할 페이지 묶기
         uses: actions/upload-pages-artifact@v3
         with:
           path: .
+
       - name: 공개하기
         id: deployment
         uses: actions/deploy-pages@v4
