@@ -1,4 +1,5 @@
 import os
+import re
 import time
 import requests
 from bs4 import BeautifulSoup
@@ -44,6 +45,18 @@ class NewsScraper:
         response.raise_for_status()
         return response.text
 
+    def _fetch_reader_text(self, url: str, timeout: int = 30) -> str:
+        """원본 사이트가 클라우드 실행 환경을 막을 때 읽기 전용 중계 경로를 쓴다."""
+        target = url.replace('https://', 'http://', 1)
+        reader_url = f"https://r.jina.ai/{target}"
+        response = requests.get(
+            reader_url,
+            headers={**self.headers, 'Accept': 'text/plain'},
+            timeout=timeout
+        )
+        response.raise_for_status()
+        return response.text
+
 class YozmITScraper(NewsScraper):
     """요즘IT 최신 기사 수집기"""
     def fetch_articles(self) -> Dict[str, Any]:
@@ -56,6 +69,7 @@ class YozmITScraper(NewsScraper):
         }
         
         list_url = 'https://yozm.wishket.com/magazine/list/develop/'
+        use_reader = False
         try:
             html = self._fetch_url(list_url)
             soup = BeautifulSoup(html, 'html.parser')
@@ -81,6 +95,24 @@ class YozmITScraper(NewsScraper):
                     
                 candidate_links.append((title, full_url))
 
+            # 요즘IT가 GitHub 서버 주소를 차단하면 읽기 전용 텍스트 경로에서
+            # 같은 공개 목록을 가져온다. 별도의 키나 로그인은 사용하지 않는다.
+            if not candidate_links:
+                reader_text = self._fetch_reader_text(list_url)
+                markdown_links = re.findall(
+                    r'\[([^\]\n]{5,180})\]\((https?://yozm\.wishket\.com)?'
+                    r'(/magazine/detail/\d+/?)\)',
+                    reader_text
+                )
+                for title, origin, path in markdown_links:
+                    clean_title = re.sub(r'\s+', ' ', title).strip()
+                    full_url = f"https://yozm.wishket.com{path}"
+                    if full_url in seen_urls or len(clean_title) < 5:
+                        continue
+                    seen_urls.add(full_url)
+                    candidate_links.append((clean_title, full_url))
+                use_reader = bool(candidate_links)
+
             result['attempted'] = len(candidate_links)
 
             for title, url in candidate_links:
@@ -88,6 +120,18 @@ class YozmITScraper(NewsScraper):
                     break
                     
                 try:
+                    if use_reader:
+                        body_text = self._fetch_reader_text(url)
+                        if len(body_text) < 200:
+                            raise ValueError('읽기 전용 본문 분량 부족')
+                        result['articles'].append({
+                            'title': title,
+                            'url': url,
+                            'body': body_text,
+                            'source': '요즘IT'
+                        })
+                        continue
+
                     detail_html = self._fetch_url(url)
                     detail_soup = BeautifulSoup(detail_html, 'html.parser')
 
