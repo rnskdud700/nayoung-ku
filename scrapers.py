@@ -1,3 +1,4 @@
+import os
 import time
 import requests
 from bs4 import BeautifulSoup
@@ -8,10 +9,37 @@ from database import is_article_recorded
 class NewsScraper:
     def __init__(self):
         self.headers = {'User-Agent': USER_AGENT}
+        self.browser_scraping = os.getenv('BROWSER_SCRAPING', '0') == '1'
 
     def _fetch_url(self, url: str, timeout: int = 10) -> str:
-        """안전한 HTTP GET 요청 (Rate Limit 적용)"""
+        """GitHub Actions에서는 실제 브라우저로, 로컬에서는 일반 요청으로 읽는다."""
         time.sleep(1.0)
+        if self.browser_scraping:
+            from playwright.sync_api import sync_playwright
+
+            with sync_playwright() as playwright:
+                browser = playwright.chromium.launch(
+                    headless=True,
+                    args=['--disable-dev-shm-usage', '--no-sandbox']
+                )
+                context = browser.new_context(
+                    user_agent=self.headers['User-Agent'],
+                    locale='ko-KR',
+                    timezone_id='Asia/Seoul',
+                    viewport={'width': 1365, 'height': 900},
+                )
+                page = context.new_page()
+                page.goto(
+                    url,
+                    wait_until='domcontentloaded',
+                    timeout=max(timeout, 30) * 1000
+                )
+                page.wait_for_timeout(1500)
+                html = page.content()
+                context.close()
+                browser.close()
+                return html
+
         response = requests.get(url, headers=self.headers, timeout=timeout)
         response.raise_for_status()
         return response.text
@@ -27,7 +55,7 @@ class YozmITScraper(NewsScraper):
             'attempted': 0
         }
         
-        list_url = 'https://yozm.wishket.com/magazine/list/all/'
+        list_url = 'https://yozm.wishket.com/magazine/list/develop/'
         try:
             html = self._fetch_url(list_url)
             soup = BeautifulSoup(html, 'html.parser')
